@@ -5,6 +5,8 @@ import numpy as np
 # Path to the folder containing "emg" and "Alignments" subfolders
 BASE_PATH = "EMG-UKA-Trial-Corpus" 
 OUTPUT_DIR = "./dataset_words"
+# Choose output format: 'npy' or 'csv'
+SAVE_FORMAT = 'csv'
 
 # EMG-UKA Constants
 FS = 600             # Sampling Rate (Hz)
@@ -112,8 +114,25 @@ for fid in common_ids:
                 word_data = clean_signal[cut_start:cut_end]
                 
                 # Save
-                fname = f"{label}_{fid}_{i}.npy"
-                np.save(os.path.join(OUTPUT_DIR, fname), word_data)
+                fmt = SAVE_FORMAT.lower()
+                if fmt == 'npy':
+                    fname = f"{label}_{fid}_{i}.npy"
+                    outpath = os.path.join(OUTPUT_DIR, fname)
+                    np.save(outpath, word_data)
+                elif fmt == 'csv':
+                    fname = f"{label}_{fid}_{i}.csv"
+                    outpath = os.path.join(OUTPUT_DIR, fname)
+                    # If 1-D, save single column; if 2-D save rows x channels with header
+                    if word_data.ndim == 1:
+                        np.savetxt(outpath, word_data, delimiter=',', fmt='%d')
+                    else:
+                        # Save 2-D array without header: rows are samples, columns are channels
+                        np.savetxt(outpath, word_data, delimiter=',', fmt='%d')
+                else:
+                    # Unknown format: fallback to .npy
+                    fname = f"{label}_{fid}_{i}.npy"
+                    outpath = os.path.join(OUTPUT_DIR, fname)
+                    np.save(outpath, word_data)
                 count += 1
                 
     except Exception as e:
