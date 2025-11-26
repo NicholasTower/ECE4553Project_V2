@@ -18,6 +18,18 @@ features_to_use = {'n_zero_crossing':[], 'rms':[], 'n_samples':0}
 train_word_dict = load_word_files(folder, target_words, features_to_use, testing_data=True)
 test_word_dict = load_word_files(folder, target_words, features_to_use, testing_data=False)
 
+def get_max_length(train_dict, test_dict):
+    max_length = 0
+    for word in train_dict:
+        for file in train_dict[word]:
+            if len(file[1][0]) > max_length:
+                max_length = len(file[1][0])
+    for word in test_dict:
+        for file in train_dict[word]:
+            if len(file[1][0]) > max_length:
+                max_length = len(file[1][0])
+    return max_length
+
 def filter_data(data):
     filter = libemg.filtering.Filter(600)
 
@@ -38,12 +50,12 @@ def filter_data(data):
     filtered_data = filter.filter(data)
     return filtered_data
 
-def get_data_labels(word_dict):
+def get_data_labels(word_dict, max_length):
     data = []
     labels = []
     for word in word_dict:
         for i, file in enumerate(word_dict[word]):
-            data.append([]) # New word
+            data.append(np.zeros(max_length)) # New word
             labels.append(word)
             # print(file[1].values)
             file[1] = filter_data(file[1].values)
@@ -54,7 +66,7 @@ def get_data_labels(word_dict):
                 data[-1].append(signal)
     return data, labels
 
-train_data, train_labels = get_data_labels(train_word_dict)
+train_data, train_labels = get_data_labels(train_word_dict, get_max_length(train_word_dict, test_word_dict))
 # print(train_data)
 # outpath = os.path.join('./data', 'train_data.npy')
 # np.save(outpath, train_data)
@@ -66,10 +78,6 @@ train_data, train_labels = get_data_labels(train_word_dict)
 # np.save(outpath, test_data)
 # outpath = os.path.join('./data', 'test_labels.npy')
 # np.save(outpath, test_labels)
-
-# print(labels)
-# print(data)
-
 
 # max_size = 0
 # for word in word_dict:

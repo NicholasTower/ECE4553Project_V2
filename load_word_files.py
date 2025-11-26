@@ -5,6 +5,7 @@ import random
 
 import numpy as np
 import pandas as pd
+
 # The format of the word dict is:
 # [class_words][file][file_name, file_contents, a dict of features (This is empty until word dict is ran through feature_extraction)]
 
