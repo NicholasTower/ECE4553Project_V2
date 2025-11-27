@@ -43,7 +43,7 @@ def load_word_files(folder, target_words, features_to_use, drop_signal=None, tes
             if drop_signal is not None:
                 # print(f'dropping signal {drop_signal}')
                 file[1] = file[1].drop(drop_signal, axis=1)
-            print(file[1])
+            # print(file[1])
 
 
         # print(word_file_names[word][0][1])
@@ -51,4 +51,4 @@ def load_word_files(folder, target_words, features_to_use, drop_signal=None, tes
 
     return word_file_names
 
-word_file_names = load_word_files(folder, target_words, features_to_use)
+word_file_names = load_word_files(folder, target_words, features_to_use, drop_signal=4)

@@ -94,21 +94,21 @@ print(len(data), len(data[0]), len(data[0][0]))
 labels = pickle.load(open('./data\\train_labels.pkl', 'rb'))
 # print(labels)
 
-# # After loading all of your words for a subject you should have an array of shape (num_words, channels, time)
-# data = np.zeros(100, 6, 15000)  # This would mean 100 words, 6 channels, 1500 timepoints
-
-# Assuming your data is in this format it should be correct to extract features from
-# You are assuming each word is a single window
-fe = libemg.feature_extractor.FeatureExtractor()
-# print(fe.get_feature_list())
-
-# Assuming your words are of different size you will have to load through them and extract features from each
-features = np.array([fe.extract_features(['RMS', 'ZC'], [d], array=True)[0] for d in data])
-# features = np.array([fe.extract_feature_group('HTD', [d], array=True) for d in train_data])
-print(features)
-print(features.shape)
-
-clf = EMGClassifier('LDA')
-# clf.fit(features, labels)
+# # # After loading all of your words for a subject you should have an array of shape (num_words, channels, time)
+# # data = np.zeros(100, 6, 15000)  # This would mean 100 words, 6 channels, 1500 timepoints
+#
+# # Assuming your data is in this format it should be correct to extract features from
+# # You are assuming each word is a single window
+# fe = libemg.feature_extractor.FeatureExtractor()
+# # print(fe.get_feature_list())
+#
+# # Assuming your words are of different size you will have to load through them and extract features from each
+# features = np.array([fe.extract_features(['RMS', 'ZC'], [d], array=True)[0] for d in data])
+# # features = np.array([fe.extract_feature_group('HTD', [d], array=True) for d in train_data])
+# print(features)
+# print(features.shape)
+#
+# clf = EMGClassifier('LDA')
+# # clf.fit(features, labels)
 
 
