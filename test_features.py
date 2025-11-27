@@ -46,7 +46,6 @@ def test_features(folder, target_words, features_to_use, drop_signal=None, featu
             clf = LinearDiscriminantAnalysis()
         elif classifier == 'SVM':
             clf = SVC()
-
         elif classifier == 'KNN':
             clf = KNeighborsClassifier()
         elif classifier == 'QDA':
