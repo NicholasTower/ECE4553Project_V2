@@ -53,7 +53,7 @@ def get_data_labels(word_dict, filter=True):
             # print(data[-1].shape)
     return data, labels
 
-def generate_pickles(filter=True):
+def generate_pickles(filter=True, drop_signal=None):
     folder = './dataset_words'
     target_words = ['THE', 'A', 'TO', 'OF', 'IN', 'ARE', 'AND', 'IS']
     # target_words = ['BETTER']
@@ -62,31 +62,38 @@ def generate_pickles(filter=True):
     features_to_use = {'n_zero_crossing': [], 'rms': [], 'n_samples': 0}
 
     print(f'Generating train pickle files... {'Filtered' if filter else 'Not Filtered'})')
-    train_word_dict = load_word_files(folder, target_words, features_to_use, testing_data=True, drop_signal=4)
+    train_word_dict = load_word_files(folder, target_words, features_to_use, testing_data=True, drop_signal=drop_signal)
     train_data, train_labels = get_data_labels(train_word_dict, filter=filter)
-    outpath = os.path.join('./data', 'train_data.pkl')
+    outpath = os.path.join('./data', f'train_data{'_nfiltered' if not filter else ''}'
+                                     f'{'_ndrop' if drop_signal is None else ''}.pkl')
     with open(outpath, 'wb') as file:
         pickle.dump(train_data, file)
     # np.save(outpath, train_data)
-    outpath = os.path.join('./data', 'train_labels.pkl')
-    with open(outpath, 'wb') as file:
-        pickle.dump(train_labels, file)
+    if filter and drop_signal is None:
+        outpath = os.path.join('./data', 'train_labels.pkl')
+        with open(outpath, 'wb') as file:
+            pickle.dump(train_labels, file)
     # np.save(outpath, train_labels)
 
     print(f'Generating test pickle files... {'Filtered' if filter else 'Not Filtered'})')
-    test_word_dict = load_word_files(folder, target_words, features_to_use, testing_data=False, drop_signal=4)
+    test_word_dict = load_word_files(folder, target_words, features_to_use, testing_data=False, drop_signal=drop_signal)
     test_data, test_labels = get_data_labels(test_word_dict, filter=filter)
-    outpath = os.path.join('./data', 'test_data.pkl')
+    outpath = os.path.join('./data', f'test_data{'_nfiltered' if not filter else ''}'
+                                     f'{'_drop' if drop_signal is not None else ''}.pkl')
     with open(outpath, 'wb') as file:
         pickle.dump(test_data, file)
     # np.save(outpath, test_data)
-    outpath = os.path.join('./data', 'test_labels.pkl')
-    with open(outpath, 'wb') as file:
-        pickle.dump(test_labels, file)
+    if filter and drop_signal is None:
+        outpath = os.path.join('./data', 'test_labels.pkl')
+        with open(outpath, 'wb') as file:
+            pickle.dump(test_labels, file)
     # np.save(outpath, test_labels)
 
 if gen_pkl:
     generate_pickles()
+    generate_pickles(drop_signal=4)
+    generate_pickles(filter=False)
+    generate_pickles(filter=False, drop_signal=4)
 
 print('loading train set')
 data = pickle.load(open('./data\\train_data.pkl', 'rb'))
@@ -97,18 +104,18 @@ labels = pickle.load(open('./data\\train_labels.pkl', 'rb'))
 # # After loading all of your words for a subject you should have an array of shape (num_words, channels, time)
 # data = np.zeros(100, 6, 15000)  # This would mean 100 words, 6 channels, 1500 timepoints
 
-# Assuming your data is in this format it should be correct to extract features from
-# You are assuming each word is a single window
-fe = libemg.feature_extractor.FeatureExtractor()
-# print(fe.get_feature_list())
-
-# Assuming your words are of different size you will have to load through them and extract features from each
-features = np.array([fe.extract_features(['RMS', 'ZC'], [d], array=True)[0] for d in data])
-# features = np.array([fe.extract_feature_group('HTD', [d], array=True) for d in train_data])
-print(features)
-print(features.shape)
-
-clf = EMGClassifier('LDA')
+# # Assuming your data is in this format it should be correct to extract features from
+# # You are assuming each word is a single window
+# fe = libemg.feature_extractor.FeatureExtractor()
+# # print(fe.get_feature_list())
+#
+# # Assuming your words are of different size you will have to load through them and extract features from each
+# features = np.array([fe.extract_features(['RMS', 'ZC'], [d], array=True)[0] for d in data])
+# # features = np.array([fe.extract_feature_group('HTD', [d], array=True) for d in train_data])
+# print(features)
+# print(features.shape)
+#
+# clf = EMGClassifier('LDA')
 # clf.fit(features, labels)
 
 
