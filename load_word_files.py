@@ -41,7 +41,9 @@ def load_word_files(folder, target_words, features_to_use, drop_signal=None, tes
             # print(file[0])
             word_file_names[word][i][1] = pd.read_csv(file[0], names=[0, 1, 2, 3, 4, 5])
             if drop_signal is not None:
-                word_file_names[word][i][1].drop(drop_signal)
+                # print(f'dropping signal {drop_signal}')
+                file[1] = file[1].drop(drop_signal, axis=1)
+            print(file[1])
 
 
         # print(word_file_names[word][0][1])

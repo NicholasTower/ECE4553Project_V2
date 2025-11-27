@@ -8,7 +8,7 @@ import pickle
 from load_word_files import load_word_files
 
 gen_pkl = False
-# gen_pkl = True
+gen_pkl = True
 
 # might need to remove channel 5
 
@@ -32,7 +32,7 @@ def filter_data(data):
     filtered_data = filter.filter(data)
     return filtered_data
 
-def get_data_labels(word_dict):
+def get_data_labels(word_dict, filter=True):
     data = []
     labels = []
     for word in word_dict:
@@ -40,7 +40,8 @@ def get_data_labels(word_dict):
             data.append([]) # New word
             labels.append(word)
             # print(file[1].values)
-            file[1] = filter_data(file[1].values)
+            if filter:
+                file[1] = filter_data(file[1].values)
             # print(file[1])
             for chl in file[1]:
                 signal = chl
@@ -52,15 +53,29 @@ def get_data_labels(word_dict):
             # print(data[-1].shape)
     return data, labels
 
-def generate_pickles():
+def generate_pickles(filter=True):
     folder = './dataset_words'
     target_words = ['THE', 'A', 'TO', 'OF', 'IN', 'ARE', 'AND', 'IS']
     # target_words = ['BETTER']
 
     # dict of features in load word files
     features_to_use = {'n_zero_crossing': [], 'rms': [], 'n_samples': 0}
-    test_word_dict = load_word_files(folder, target_words, features_to_use, testing_data=False)
-    test_data, test_labels = get_data_labels(test_word_dict)
+
+    print(f'Generating train pickle files... {'Filtered' if filter else 'Not Filtered'})')
+    train_word_dict = load_word_files(folder, target_words, features_to_use, testing_data=True, drop_signal=4)
+    train_data, train_labels = get_data_labels(train_word_dict, filter=filter)
+    outpath = os.path.join('./data', 'train_data.pkl')
+    with open(outpath, 'wb') as file:
+        pickle.dump(train_data, file)
+    # np.save(outpath, train_data)
+    outpath = os.path.join('./data', 'train_labels.pkl')
+    with open(outpath, 'wb') as file:
+        pickle.dump(train_labels, file)
+    # np.save(outpath, train_labels)
+
+    print(f'Generating test pickle files... {'Filtered' if filter else 'Not Filtered'})')
+    test_word_dict = load_word_files(folder, target_words, features_to_use, testing_data=False, drop_signal=4)
+    test_data, test_labels = get_data_labels(test_word_dict, filter=filter)
     outpath = os.path.join('./data', 'test_data.pkl')
     with open(outpath, 'wb') as file:
         pickle.dump(test_data, file)
@@ -68,15 +83,16 @@ def generate_pickles():
     outpath = os.path.join('./data', 'test_labels.pkl')
     with open(outpath, 'wb') as file:
         pickle.dump(test_labels, file)
-# np.save(outpath, test_labels)
+    # np.save(outpath, test_labels)
 
 if gen_pkl:
     generate_pickles()
 
+print('loading train set')
 data = pickle.load(open('./data\\train_data.pkl', 'rb'))
-print(data)
+print(len(data), len(data[0]), len(data[0][0]))
 labels = pickle.load(open('./data\\train_labels.pkl', 'rb'))
-print(labels)
+# print(labels)
 
 # # After loading all of your words for a subject you should have an array of shape (num_words, channels, time)
 # data = np.zeros(100, 6, 15000)  # This would mean 100 words, 6 channels, 1500 timepoints
@@ -85,9 +101,6 @@ print(labels)
 # You are assuming each word is a single window
 fe = libemg.feature_extractor.FeatureExtractor()
 # print(fe.get_feature_list())
-
-# # Assuming all your words are the same size you can pass the whole array
-# feats = fe.extract_features(['RMS'], data, array=True)
 
 # Assuming your words are of different size you will have to load through them and extract features from each
 features = np.array([fe.extract_features(['RMS', 'ZC'], [d], array=True)[0] for d in data])
