@@ -8,7 +8,7 @@ import glob
 DATA_DIR = "./dataset_words" 
 
 # The word you want to compare (case-sensitive to the labels in words_*.txt)
-TARGET_WORD = "THIS" 
+TARGET_WORD = "IS" 
 
 FS = 600 # Sampling Rate (Hz)
 
