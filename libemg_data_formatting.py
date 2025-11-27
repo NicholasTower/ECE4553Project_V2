@@ -61,7 +61,8 @@ def generate_pickles(filter=True, drop_signal=None):
     # dict of features in load word files
     features_to_use = {'n_zero_crossing': [], 'rms': [], 'n_samples': 0}
 
-    print(f'Generating train pickle files... {'Filtered' if filter else 'Not Filtered'})')
+    print(f'Generating train pickle files... {'Filtered' if filter else 'Not Filtered'} '
+          f'{'Not Dropped' if drop_signal is None else 'Dropped'}')
     train_word_dict = load_word_files(folder, target_words, features_to_use, testing_data=True, drop_signal=drop_signal)
     train_data, train_labels = get_data_labels(train_word_dict, filter=filter)
     outpath = os.path.join('./data', f'train_data{'_nfiltered' if not filter else ''}'
@@ -75,11 +76,12 @@ def generate_pickles(filter=True, drop_signal=None):
             pickle.dump(train_labels, file)
     # np.save(outpath, train_labels)
 
-    print(f'Generating test pickle files... {'Filtered' if filter else 'Not Filtered'})')
+    print(f'Generating test pickle files... {'Filtered' if filter else 'Not Filtered'} '
+          f'{'Not Dropped' if drop_signal is None else 'Dropped'}')
     test_word_dict = load_word_files(folder, target_words, features_to_use, testing_data=False, drop_signal=drop_signal)
     test_data, test_labels = get_data_labels(test_word_dict, filter=filter)
     outpath = os.path.join('./data', f'test_data{'_nfiltered' if not filter else ''}'
-                                     f'{'_drop' if drop_signal is not None else ''}.pkl')
+                                     f'{'_ndrop' if drop_signal is None else ''}.pkl')
     with open(outpath, 'wb') as file:
         pickle.dump(test_data, file)
     # np.save(outpath, test_data)
