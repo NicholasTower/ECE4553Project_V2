@@ -47,7 +47,7 @@ def get_data_labels(word_dict, filter=True):
             labels.append(word)
             # print(file[1].values)
             if filter:
-                file[1] = filter_data(file[1].values)
+                file[1] = filter_data(file[1])
             # print(file[1])
             for chl in file[1]:
                 signal = chl

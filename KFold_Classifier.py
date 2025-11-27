@@ -73,6 +73,6 @@ def kfold_classifier(data, labels, classifier='LDA'):
 
 
 kfold_classifier(data, labels, classifier='LDA')
-kfold_classifier(data, labels, classifier='SVM')
-kfold_classifier(data, labels, classifier='KNN')
 kfold_classifier(data, labels, classifier='QDA')
+kfold_classifier(data, labels, classifier='KNN')
+kfold_classifier(data, labels, classifier='SVM')

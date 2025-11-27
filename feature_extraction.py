@@ -1,4 +1,6 @@
 import warnings
+from sklearn.decomposition import PCA
+
 warnings.filterwarnings(
         "ignore",
         category=UserWarning,
@@ -6,6 +8,7 @@ warnings.filterwarnings(
     )
 import libemg
 import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 data_file = r"data/train_data.pkl"
 labels_file = r"data/train_labels.pkl"
@@ -16,6 +19,30 @@ def feature_list_loop(feature_list, data, labels):
     features = np.array([fe.extract_features([feature_list], [d], array=True)[0] for d in data])
     # features = np.array([fe.extract_feature_group('HTD', [d], array=True) for d in train_data])
     return features
+
+def feature_visualization(old_features, old_labels):
+    # Here we can visualize the feature set and decide what is best.
+    ss = StandardScaler()
+    scaled_features = ss.fit_transform(old_features)
+
+    # Principle Components:
+    percent_retained = 90
+    pca = PCA()
+    transformed_features = pca.fit_transform(scaled_features)
+    eigenvectors = pca.explained_variance_ratio_
+    cumsum = 0
+    needed = []
+    # print(len(eigenvectors))
+    for i in eigenvectors:
+        cumsum += i*100
+        needed.append(cumsum)
+        if cumsum >= percent_retained:
+            break
+    print(f"Variance kept of Training Dataset: {cumsum:.2f}% using {len(needed)} component(s)\n")
+    # for i in range(0, len(needed)):
+    #     print(labels[i])
+
+    return transformed_features, old_labels
 
 def get_extracted_features(data, labels):
     # # After loading all of your words for a subject you should have an array of shape (num_words, channels, time)
@@ -49,6 +76,8 @@ def get_extracted_features(data, labels):
     features = np.array([fe.extract_features(possible_features, [d], array=True)[0] for d in data])
     # print(features)
     # print(features.shape)
+
+    feature, labels = feature_visualization(features, labels)
 
     return features, labels
 
