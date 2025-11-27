@@ -4,7 +4,7 @@ from sklearn.model_selection import KFold
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 
-from feature_extraction import feature_extraction
+from manual_feature_extraction import feature_extraction
 
 folder = './dataset_words'
 target_words = ['A', 'THIS', 'ARE', 'AS']
