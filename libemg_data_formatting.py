@@ -1,5 +1,11 @@
 import os
 
+import warnings         #Gets rid of pygame warning
+warnings.filterwarnings(
+        "ignore",
+        category=UserWarning,
+        module="pygame.pkgdata"
+    )
 import libemg
 from libemg.emg_predictor import EMGClassifier
 import numpy as np
