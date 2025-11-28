@@ -1,3 +1,6 @@
 EMG-UKA-Trial-Corpus/
 dataset_words/
 CSL-EMG_Array
+.venv/
+.idea/
+__pychache__/

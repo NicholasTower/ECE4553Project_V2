@@ -6,7 +6,7 @@ import numpy as np
 BASE_PATH = "EMG-UKA-Trial-Corpus" 
 OUTPUT_DIR = "./dataset_words"
 # Choose output format: 'npy' or 'csv'
-SAVE_FORMAT = 'csv'
+SAVE_FORMAT = 'npy'
 
 # EMG-UKA Constants
 FS = 600             # Sampling Rate (Hz)
