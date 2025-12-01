@@ -24,7 +24,7 @@ def load_word_files(folder, target_words, features_to_use, drop_signal=None, tes
     for word in target_words:
         word_file_names[word] = []
 
-    for file in glob.glob(os.path.join(folder, '*.csv')):
+    for file in glob.glob(os.path.join(folder, '*.npy')):
         # print(file)
         if file[file.find('\\')+1:file.find('_0')] in target_words:
             word_file_names[file[file.find('\\')+1:file.find('_0')]].append([file, [], copy.deepcopy(features_to_use)])
@@ -39,11 +39,11 @@ def load_word_files(folder, target_words, features_to_use, drop_signal=None, tes
 
         for i, file in enumerate(word_file_names[word]):
             # print(file[0])
-            word_file_names[word][i][1] = pd.read_csv(file[0], names=[0, 1, 2, 3, 4, 5])
+            file[1] = np.load(file[0])
             if drop_signal is not None:
                 # print(f'dropping signal {drop_signal}')
-                file[1] = file[1].drop(drop_signal, axis=1)
-            # print(file[1])
+                file[1] = np.delete(file[1], drop_signal, axis=1)
+            # print(file[1].shape)
 
 
         # print(word_file_names[word][0][1])

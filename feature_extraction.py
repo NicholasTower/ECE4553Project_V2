@@ -1,97 +1,89 @@
+import warnings
+from sklearn.decomposition import PCA
+
+warnings.filterwarnings(
+        "ignore",
+        category=UserWarning,
+        module="pygame.pkgdata"
+    )
 import libemg
 import numpy as np
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
-from sklearn.model_selection import KFold
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
 
-data = np.load(r"data/test_data.pkl", allow_pickle=True)
-labels = np.load(r"data/test_labels.pkl", allow_pickle=True)
-
-# # After loading all of your words for a subject you should have an array of shape (num_words, channels, time)
-# data = np.zeros(100, 6, 15000)  # This would mean 100 words, 6 channels, 1500 timepoints
-
-# Assuming your data is in this format it should be correct to extract features from
-# You are assuming each word is a single window
-fe = libemg.feature_extractor.FeatureExtractor()
-# print(fe.get_feature_list())
-
-HTD = ['MAV','ZC','WL']
-# TDAR = ['MAV','ZC','SSC','WL','AR4'] SCC and AR4 require windows
-LS4 = ['WAMP'] # Removed LS, MFL and MSR as they require windows
-# TDPSD = ['M0','M2','M4','SPARSI','IRF','WLF'] none worked
-TSTD = ['DASDV','WAMP','ZC','MFL','SAMPEN',] #removed *TDPSD, MAVFD, DASDV, MFL, SAMPEN
-Combined = ['WL','SCC','LD','AR9'] # 
-# feature_group_list = [HTD, TDAR, LS4, TDPSD, TSTD, Combined]
-
-features = np.array([fe.extract_features('ZC', [d], array=True) for d in data])
-print(features)
-print(features.shape)
-
+data_file = r"data/train_data.pkl"
+labels_file = r"data/train_labels.pkl"
 
 def feature_list_loop(feature_list, data, labels):
+    fe = libemg.feature_extractor.FeatureExtractor()
     # Assuming your words are of different size you will have to load through them and extract features from each
     features = np.array([fe.extract_features([feature_list], [d], array=True)[0] for d in data])
     # features = np.array([fe.extract_feature_group('HTD', [d], array=True) for d in train_data])
+    return features
 
-    def test_features(features, labels, classifier='LDA'):
-        percentages = []
-        kf = KFold(n_splits=10, shuffle=True)
-        kf.get_n_splits(features)
+def feature_visualization(old_features, old_labels):
+    # Here we can visualize the feature set and decide what is best.
+    ss = StandardScaler()
+    scaled_features = ss.fit_transform(old_features)
 
-        print(f'Beginning KFold with {classifier} splits')
-        for i, (train_index, test_index) in enumerate(kf.split(features)):
-            # print(f"Fold {i}:")
-            # print(f"  Train: index={train_index}")
-            # print(f"  Test:  index={test_index}")
-            if classifier == 'LDA':
-                clf = LinearDiscriminantAnalysis()
-            elif classifier == 'SVM':
-                clf = SVC()
-            elif classifier == 'KNN':
-                clf = KNeighborsClassifier()
-            elif classifier == 'QDA':
-                clf = QuadraticDiscriminantAnalysis()
-            train_features = []
-            train_labels = []
-            for j in train_index:
-                train_features.append(features[j])
-                train_labels.append(labels[j])
+    # Principle Components:
+    percent_retained = 90
+    pca = PCA()
+    transformed_features = pca.fit_transform(scaled_features)
+    eigenvectors = pca.explained_variance_ratio_
+    cumsum = 0
+    needed = []
+    # print(len(eigenvectors))
+    for i in eigenvectors:
+        cumsum += i*100
+        needed.append(cumsum)
+        if cumsum >= percent_retained:
+            break
+    print(f"Variance kept of Training Dataset: {cumsum:.2f}% using {len(needed)} component(s)\n")
+    # for i in range(0, len(needed)):
+    #     print(labels[i])
 
-            # print('Train features', train_features)
-            # print('Train labels', train_labels)
-            clf.fit(train_features, train_labels)
+    return transformed_features, old_labels
 
-            test_features = []
-            test_labels = []
-            for j in test_index:
-                test_features.append(features[j])
-                test_labels.append(labels[j])
+def get_extracted_features(data, labels):
+    # # After loading all of your words for a subject you should have an array of shape (num_words, channels, time)
+    # data = np.zeros(100, 6, 15000)  # This would mean 100 words, 6 channels, 1500 timepoints
 
-            # print(f"   Real: index={test_labels}")
-            resultant_prediction = clf.predict(test_features)
-            # print(f"Guesses: {resultant_prediction}")
-            total_correct = 0
-            for k in range(len(test_labels)):
-                if test_labels[k] == resultant_prediction[k]:
-                    total_correct += 1
-            percentages.append((total_correct / len(test_labels)) * 100)
-            print(f"   Fold: {i}  Correct: {total_correct} -> {round(percentages[len(percentages) - 1], 2)}%")
-        average_percentage = np.mean(percentages)
-        standard_deviation = np.std(percentages)
-        print(f"Average: {round(average_percentage, 2)}%")
-        print(f"     SD: {round(standard_deviation, 2)}%\n\n")
-        all_percentages = dict()
-        all_percentages["Standard Deviation"] = standard_deviation
-        all_percentages["All"] = percentages
-        all_percentages["Average"] = average_percentage
-        return all_percentages
+    # Assuming your data is in this format it should be correct to extract features from
+    # You are assuming each word is a single window
+    fe = libemg.feature_extractor.FeatureExtractor()
+    # print(fe.get_feature_list())
 
-    test_features(features, labels, classifier='LDA')
-# test_features(features, labels, classifier='SVM')
-# test_features(features, labels, classifier='KNN')
-# test_features(features, labels, classifier='QDA')
+    HTD = ['MAV','ZC','WL']
+    TDAR = ['MAV','ZC','WL','AR4']
+    LS4 = ['LS','MFL','MSR','WAMP']
+    TDPSD = ['M0','M2','M4','SPARSI','IRF','WLF']
+    TSTD = ['MAVFD','DASDV','WAMP','ZC','MFL','SAMPEN',*TDPSD]
+    Combined = ['WL','SCC','LD','AR9']
+    # print(TSTD)
+    feature_group_list = [HTD, TDAR, LS4, TDPSD, TSTD, Combined]
 
+    # List from
+    possible_features = ['MAV', 'ZC', 'WL', 'MFL', 'WAMP', 'RMS', 'IAV', 'DASDV', 'VAR', 'LD', 'MAVFD', 'SKEW', 'KURT',
+                         'WENG']
+    gives_warnings = ['WV', 'WWL', 'WENT', 'MEAN']
+
+    # # Tests all features
+    # for feat in possible_features:
+    #     print(feat)
+    #     features = np.array([fe.extract_features([feat], [d], array=True)[0] for d in data])
+
+    # features = np.array([fe.extract_features(['MAV'], [d], array=True)[0] for d in data])
+    features = np.array([fe.extract_features(possible_features, [d], array=True)[0] for d in data])
+    # print(features)
+    # print(features.shape)
+
+    feature, labels = feature_visualization(features, labels)
+
+    return features, labels
+
+data = np.load(data_file, allow_pickle=True)
+labels = np.load(labels_file, allow_pickle=True)
+get_extracted_features(data, labels)
 # for feature_list in feature_group_list:
 #     print(f'Testing feature set: {feature_list}')
 #     feature_list_loop(feature_list, data, labels)
