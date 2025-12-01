@@ -17,14 +17,14 @@ fe = libemg.feature_extractor.FeatureExtractor()
 # print(fe.get_feature_list())
 
 HTD = ['MAV','ZC','WL']
-TDAR = ['MAV','ZC','WL','AR4']
-LS4 = ['LS','MFL','MSR','WAMP']
-TDPSD = ['M0','M2','M4','SPARSI','IRF','WLF']
-TSTD = ['MAVFD','DASDV','WAMP','ZC','MFL','SAMPEN',*TDPSD]
-Combined = ['WL','SCC','LD','AR9']
-feature_group_list = [HTD, TDAR, LS4, TDPSD, TSTD, Combined]
+# TDAR = ['MAV','ZC','SSC','WL','AR4'] SCC and AR4 require windows
+LS4 = ['WAMP'] # Removed LS, MFL and MSR as they require windows
+# TDPSD = ['M0','M2','M4','SPARSI','IRF','WLF'] none worked
+TSTD = ['DASDV','WAMP','ZC','MFL','SAMPEN',] #removed *TDPSD, MAVFD, DASDV, MFL, SAMPEN
+Combined = ['WL','SCC','LD','AR9'] # 
+# feature_group_list = [HTD, TDAR, LS4, TDPSD, TSTD, Combined]
 
-features = np.array([fe.extract_features('MAV', [d], array=True)[0] for d in data])
+features = np.array([fe.extract_features('ZC', [d], array=True) for d in data])
 print(features)
 print(features.shape)
 
