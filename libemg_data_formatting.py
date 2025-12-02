@@ -13,8 +13,8 @@ import pickle
 
 from load_word_files import load_word_files
 
-gen_pkl = False
 gen_pkl = True
+# gen_pkl = False
 
 # might need to remove channel 5
 

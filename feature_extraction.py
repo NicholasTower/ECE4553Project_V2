@@ -1,5 +1,9 @@
 import warnings
+from matplotlib import pyplot as plt, cm
+from matplotlib.colors import Normalize
 from sklearn.decomposition import PCA
+from sklearn.decomposition import KernelPCA
+from sklearn.decomposition import FastICA
 
 warnings.filterwarnings(
         "ignore",
@@ -27,7 +31,7 @@ def feature_visualization(old_features, old_labels):
 
     # Principle Components:
     percent_retained = 90
-    pca = PCA()
+    pca = PCA(random_state=0)
     transformed_features = pca.fit_transform(scaled_features)
     eigenvectors = pca.explained_variance_ratio_
     cumsum = 0
@@ -35,14 +39,59 @@ def feature_visualization(old_features, old_labels):
     # print(len(eigenvectors))
     for i in eigenvectors:
         cumsum += i*100
-        needed.append(cumsum)
+        needed.append(i)
         if cumsum >= percent_retained:
             break
-    print(f"Variance kept of Training Dataset: {cumsum:.2f}% using {len(needed)} component(s)\n")
-    # for i in range(0, len(needed)):
-    #     print(labels[i])
+    print(transformed_features.shape)
+    transformed_features = transformed_features.tolist()
+    for i, word in enumerate(transformed_features):
+        transformed_features[i] = word[:len(needed)]
+    transformed_features = np.array(transformed_features)
 
-    return transformed_features, old_labels
+    plt.figure()
+    plt.plot(range(1, len(eigenvectors) + 1), eigenvectors, color="red", marker="o")
+    plt.bar(range(1, len(eigenvectors) + 1), eigenvectors)
+    plt.xlabel("Eigenvector")
+    plt.ylabel("Eigenvalue")
+    plt.title(f"Scree Plot of Dataset Words with {PCA}")
+    plt.grid(True)
+    # plt.show()
+
+    loadings = pca.components_.T * np.sqrt(pca.explained_variance_)
+    # print(loadings)
+    plt.figure()
+    if len(transformed_features[0]) > 1:
+        plt.scatter(transformed_features[:, 0], transformed_features[:, 1], alpha=0.7, label='Observations', s=5)
+        u = loadings[:, 0]
+        v = loadings[:, 1]
+
+        angles = np.arctan2(v, u)
+        norm = Normalize()
+        norm.autoscale(angles)
+        colormap = cm.inferno
+        # norm = plt.Normalize(angles.min(), angles.max())
+        # cmap = cm.hsv
+        plt.quiver([0] * len(u), [0] * len(v), u, v, color=colormap(norm(angles)), alpha=0.8, scale=3,
+                   angles='xy')
+        # for i in range(len(u)):
+        #     plt.text(u[i], v[i], columns)
+
+        plt.xlabel(f'Principal Component 1 (Explained Variance: {eigenvectors[0]:.2f})')
+        plt.ylabel(f'Principal Component 2 (Explained Variance: {eigenvectors[1]:.2f})')
+
+    plt.title(f'PCA Biplot')
+    plt.grid(True)
+    plt.axhline(0, color='grey', linewidth=0.5)
+    plt.axvline(0, color='grey', linewidth=0.5)
+    # plt.show()
+
+    # ICA
+    # ica = FastICA(n_components=1, random_state=0)
+    # vectors = ica.fit_transform(scaled_features)
+
+    print(f"Variance kept of Training Dataset: {cumsum:.2f}% using {len(needed)} component(s)\n")
+    return transformed_features, old_labels     # PCA
+    # return vectors, old_labels                  # ICA
 
 def get_extracted_features(data, labels):
     # # After loading all of your words for a subject you should have an array of shape (num_words, channels, time)

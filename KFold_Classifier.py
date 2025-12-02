@@ -18,9 +18,10 @@ labels = np.load(labels_file, allow_pickle=True)
 
 def kfold_classifier(data, labels, classifier='LDA'):
     features, labels = get_extracted_features(data, labels)
+    print(features.shape)
 
     percentages = []
-    kf = KFold(n_splits=10, shuffle=True)
+    kf = KFold(n_splits=10, shuffle=True, random_state=0)
     kf.get_n_splits(features)
 
     print(f'Beginning KFold with {classifier} splits')
