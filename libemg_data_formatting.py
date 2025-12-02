@@ -28,7 +28,7 @@ gen_pkl = True
 # might need to remove channel 5
 
 def filter_data(data):
-    filter = libemg.filtering.Filter(600)
+    filter = libemg.filtering.Filter(sampling_frequency=600)
 
     if not isinstance(data, np.ndarray):
         data = np.array(data)  # Ensure it's a numpy array
