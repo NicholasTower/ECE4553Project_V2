@@ -108,9 +108,9 @@ def generate_pickles(filter=True, drop_signal=None):
 
 if gen_pkl:
     generate_pickles()
-    generate_pickles(drop_signal=4)
-    generate_pickles(filter=False)
-    generate_pickles(filter=False, drop_signal=4)
+    # generate_pickles(drop_signal=4)
+    # generate_pickles(filter=False)
+    # generate_pickles(filter=False, drop_signal=4)
 
 print('loading train set')
 data = pickle.load(open('./data\\train_data.pkl', 'rb'))

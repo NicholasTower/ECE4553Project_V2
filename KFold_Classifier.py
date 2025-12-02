@@ -14,8 +14,8 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 from feature_extraction import get_extracted_features
 
-data_file = r"data/train_data_ndrop.pkl"
-labels_file = r"data/train_labels.pkl"
+data_file = r"data\train_data_ndrop_fewer_the.pkl"
+labels_file = r"data\train_labels_fewer_the.pkl"
 
 def kfold_classifier(features, labels, classifier='LDA'):
 
