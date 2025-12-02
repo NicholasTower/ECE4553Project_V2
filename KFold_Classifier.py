@@ -77,8 +77,10 @@ def main():
     labels = np.load(labels_file, allow_pickle=True)
 
     print("Getting features...")
-    features, labels = get_extracted_features(data, labels, variance_kept=0.9)
+    # for i in range(1, 20):
+    # features, labels = get_extracted_features(data, labels, variance_kept=0.9, methods_to_use=['pca', 'sfs'], n=i)
 
+    features, labels = get_extracted_features(data, labels, variance_kept=0.9, methods_to_use=['pca'])
     kfold_classifier(features, labels, classifier='LDA')
     kfold_classifier(features, labels, classifier='QDA')
     kfold_classifier(features, labels, classifier='KNN')
