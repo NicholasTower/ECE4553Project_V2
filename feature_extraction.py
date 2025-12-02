@@ -29,7 +29,7 @@ def feature_list_loop(feature_list, data, labels):
     return features
 
 def plotLDA(labels, features, dataset, plot=True):
-
+    print('Performing LDA...')
     lda = LinearDiscriminantAnalysis()
     scores = lda.fit_transform(features, labels)
 
@@ -56,6 +56,7 @@ def plotLDA(labels, features, dataset, plot=True):
     return scores
 
 def apply_pca(old_features, old_labels, variance_kept=0.90, show_plots=False):
+    print('Performing PCA...')
     # Principle Components:
     pca = PCA(n_components=variance_kept, random_state=0)
     transformed_features = pca.fit_transform(old_features)
@@ -115,6 +116,7 @@ def apply_pca(old_features, old_labels, variance_kept=0.90, show_plots=False):
     # return vectors, old_labels                  # ICA
 
 def sfs_optimizer(features, labels, n):
+    print('Performing SFS...')
     clf = LinearDiscriminantAnalysis()
     sfs = SequentialFeatureSelector(clf, n_features_to_select=n)
     sfs.fit(features, labels)

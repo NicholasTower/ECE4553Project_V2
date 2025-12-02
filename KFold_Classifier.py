@@ -12,10 +12,10 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 from feature_extraction import get_extracted_features
 
-data_file = r"data/train_data.pkl"
+data_file = r"data/train_data_ndrop.pkl"
 labels_file = r"data/train_labels.pkl"
 
-def kfold_classifier(features, labels, classifier='LDA'):
+def kfold_classifier(features, labels, classifier='LDA', svm_kernal='rbf'):
     # features, labels = get_extracted_features(data, labels)
     # print(features.shape)
 
@@ -23,7 +23,7 @@ def kfold_classifier(features, labels, classifier='LDA'):
     kf = KFold(n_splits=8, shuffle=True, random_state=0)
     kf.get_n_splits(features)
 
-    print(f'Beginning KFold with {classifier} splits')
+    print(f'Beginning KFold with {classifier} {svm_kernal if classifier=="SVM" else ''} splits')
     for i, (train_index, test_index) in enumerate(kf.split(features)):
         # print(f"Fold {i}:")
         # print(f"  Train: index={train_index}")
@@ -31,7 +31,7 @@ def kfold_classifier(features, labels, classifier='LDA'):
         if classifier == 'LDA':
             clf = LinearDiscriminantAnalysis()
         elif classifier == 'SVM':
-            clf = SVC()
+            clf = SVC(kernel=svm_kernal)
         elif classifier == 'KNN':
             clf = KNeighborsClassifier()
         elif classifier == 'QDA':
@@ -80,11 +80,16 @@ def main():
     # for i in range(1, 20):
     # features, labels = get_extracted_features(data, labels, variance_kept=0.9, methods_to_use=['pca', 'sfs'], n=i)
 
-    features, labels = get_extracted_features(data, labels, variance_kept=0.9, methods_to_use=['pca'])
+    # features, labels = get_extracted_features(data, labels, variance_kept=0.9, methods_to_use=['pca'])
+    # features, labels = get_extracted_features(data, labels, variance_kept=0.9, methods_to_use=['sfs', 'lda'])
+    features, labels = get_extracted_features(data, labels, variance_kept=0.9, methods_to_use=['lda'])
     kfold_classifier(features, labels, classifier='LDA')
-    kfold_classifier(features, labels, classifier='QDA')
-    kfold_classifier(features, labels, classifier='KNN')
-    kfold_classifier(features, labels, classifier='SVM')
+    # kfold_classifier(features, labels, classifier='QDA')
+    # kfold_classifier(features, labels, classifier='KNN')
+    kfold_classifier(features, labels, classifier='SVM', svm_kernal='rbf')
+    kfold_classifier(features, labels, classifier='SVM', svm_kernal='linear')
+    # kfold_classifier(features, labels, classifier='SVM', svm_kernal='sigmoid')
+    # kfold_classifier(features, labels, classifier='SVM', svm_kernal='poly')
 
 if __name__ == "__main__":
     main()
