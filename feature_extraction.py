@@ -6,6 +6,7 @@ from matplotlib.colors import Normalize
 from sklearn.decomposition import PCA
 from sklearn.decomposition import KernelPCA
 from sklearn.decomposition import FastICA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 warnings.filterwarnings(
         "ignore",
@@ -25,6 +26,33 @@ def feature_list_loop(feature_list, data, labels):
     features = np.array([fe.extract_features([feature_list], [d], array=True)[0] for d in data])
     # features = np.array([fe.extract_feature_group('HTD', [d], array=True) for d in train_data])
     return features
+
+def plotLDA(labels, features, dataset, plot=True):
+
+    lda = LinearDiscriminantAnalysis()
+    scores = lda.fit_transform(features, labels)
+
+    # if (plot):
+    #     cmap = plt.get_cmap('tab10')
+    #     colors = {lab: cmap(i%10) for i, lab in enumerate(np.unique(labels))}
+
+    #     plt.xlabel("LD1")
+    #     plt.title("LDA Projection for "+dataset)
+    #     plt.grid(True)
+
+    #     for lab in np.unique(labels):
+    #         mask = (labels == lab)
+    #         if (scores.shape[1] == 1):
+    #             plt.scatter(scores[mask, 0], np.random.normal(loc=0, scale = 0.05, size=sum(mask)), label=str(lab), color=colors[lab], s=50)
+    #             plt.yticks([])  # remove y-axis, it's meaningless
+    #         else:
+    #             plt.scatter(scores[mask, 0], scores[mask, 1], label=str(lab), color=colors[lab], s=50, alpha=0.3, edgecolors="black")
+    #             plt.ylabel("LD2")
+
+    #     plt.legend()
+    #     plt.show()
+
+    return scores
 
 def apply_pca(old_features, old_labels, variance_kept=0.90, show_plots=False):
     # Here we can visualize the feature set and decide what is best.
@@ -119,10 +147,11 @@ def get_extracted_features(data, labels, variance_kept=0.9, show_plots=False):
 
     # features = np.array([fe.extract_features(['MAV'], [d], array=True)[0] for d in data])
     features = np.array([fe.extract_features(possible_features, [d], array=True)[0] for d in data])
-    # print(features)
-    # print(features.shape)
+    print(features)
+    print(features.shape)
 
-    features, labels = apply_pca(features, labels, variance_kept=variance_kept, show_plots=show_plots)
+    # features, labels = apply_pca(features, labels, variance_kept=variance_kept, show_plots=show_plots)
+    features = plotLDA(labels, features, "Training Dataset", plot=show_plots)
 
     return features, labels
 
