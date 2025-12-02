@@ -17,7 +17,7 @@ from feature_extraction import get_extracted_features
 data_file = r"data\train_data_ndrop_fewer_the.pkl"
 labels_file = r"data\train_labels_fewer_the.pkl"
 
-def kfold_classifier(features, labels, classifier='LDA', svm_kernal='rbf'):
+def kfold_classifier(features, labels, classifier='LDA', svm_kernal='rbf', plot_confusion_matrix=False):
 
     class_names = np.unique(labels)
     all_true_labels = []
@@ -75,7 +75,8 @@ def kfold_classifier(features, labels, classifier='LDA', svm_kernal='rbf'):
     print(f"Average: {round(average_percentage, 2)}%")
     print(f"     SD: {round(standard_deviation, 2)}%\n\n")
 
-    plot_confusion_matrix_no_encoding(all_true_labels, all_predictions, class_names, classifier)
+    if plot_confusion_matrix:
+        plot_confusion_matrix_no_encoding(all_true_labels, all_predictions, class_names, classifier)
 
     all_percentages = dict()
     all_percentages["Standard Deviation"] = standard_deviation
@@ -96,7 +97,7 @@ def plot_confusion_matrix_no_encoding(true_labels, pred_labels, class_names, cla
     fig, ax = plt.subplots(figsize=(8, 8))
     disp.plot(cmap=plt.cm.Blues, ax=ax, xticks_rotation='vertical', values_format='d')
     
-    ax.set_title(f'Confusion Matrix for {classifier_name} (Aggregated K-Fold)')
+    ax.set_title(f'Confusion Matrix for {classifier_name} (Aggregated K-Fold) without Reduced "the" Class')
     plt.tight_layout()
     plt.show()
 
@@ -115,7 +116,7 @@ def main():
     labels = np.load(labels_file, allow_pickle=True)
 
     print("Getting features...")
-    # for i in range(1, 20):
+    # for i in range(1, 7):
     # features, labels = get_extracted_features(data, labels, variance_kept=0.9, methods_to_use=['pca', 'sfs'], n=i)
 
     # features, labels = get_extracted_features(data, labels, variance_kept=0.9, methods_to_use=['pca'])
@@ -124,8 +125,8 @@ def main():
     kfold_classifier(features, labels, classifier='LDA')
     # kfold_classifier(features, labels, classifier='QDA')
     # kfold_classifier(features, labels, classifier='KNN')
-    kfold_classifier(features, labels, classifier='SVM', svm_kernal='rbf')
-    kfold_classifier(features, labels, classifier='SVM', svm_kernal='linear')
+    # kfold_classifier(features, labels, classifier='SVM', svm_kernal='rbf')
+    # kfold_classifier(features, labels, classifier='SVM', svm_kernal='linear')
     # kfold_classifier(features, labels, classifier='SVM', svm_kernal='sigmoid')
     # kfold_classifier(features, labels, classifier='SVM', svm_kernal='poly')
 

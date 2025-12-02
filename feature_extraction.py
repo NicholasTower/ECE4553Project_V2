@@ -19,8 +19,8 @@ import libemg
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 
-data_file = r"data/train_data.pkl"
-labels_file = r"data/train_labels.pkl"
+data_file = r"data/train_data_ndrop_fewer_the.pkl"
+labels_file = r"data/train_labels_fewer_the.pkl"
 
 def feature_list_loop(feature_list, data, labels):
     fe = libemg.feature_extractor.FeatureExtractor()
@@ -29,11 +29,10 @@ def feature_list_loop(feature_list, data, labels):
     # features = np.array([fe.extract_feature_group('HTD', [d], array=True) for d in train_data])
     return features
 
-def plotLDA(labels, features, dataset, plot=True):
+def plotLDA(labels, features, dataset, plot=False):
     print('Performing LDA...')
     lda = LinearDiscriminantAnalysis()
     scores = lda.fit_transform(features, labels)
-    print(scores)
 
     if (plot):
 
@@ -52,7 +51,7 @@ def plotLDA(labels, features, dataset, plot=True):
                         label=target_name)
 
         plt.legend(loc='best', shadow=False, scatterpoints=1, title='Classes')
-        plt.title('LDA Projection of EMG Data onto 2 Dimensions')
+        plt.title('LDA Projection of EMG Data onto 2 Dimensions with Reduced "the" Class')
         plt.xlabel('LDA Component 1')
         plt.ylabel('LDA Component 2')
         plt.grid(True)
@@ -175,7 +174,7 @@ def get_extracted_features(data, labels, variance_kept=0.9, show_plots=False, me
         if method == 'pca':
             features, labels = apply_pca(features, labels, variance_kept=variance_kept, show_plots=show_plots)
         if method == 'lda':
-            features = plotLDA(labels, features, "Training Dataset", plot=show_plots)
+            features = plotLDA(labels, features, "Training Dataset")
         if method == 'sfs':
             features = sfs_optimizer(features, labels, n=n)
 
@@ -185,7 +184,7 @@ def get_extracted_features(data, labels, variance_kept=0.9, show_plots=False, me
 def main():
     data = np.load(data_file, allow_pickle=True)
     labels = np.load(labels_file, allow_pickle=True)
-    get_extracted_features(data, labels, variance_kept=0.90, show_plots=True)
+    get_extracted_features(data, labels, variance_kept=0.90, methods_to_use=['lda'], show_plots=True)
     # for feature_list in feature_group_list:
     #     print(f'Testing feature set: {feature_list}')
     #     feature_list_loop(feature_list, data, labels)
