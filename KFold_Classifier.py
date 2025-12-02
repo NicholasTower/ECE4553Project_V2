@@ -124,8 +124,8 @@ def main():
     kfold_classifier(features, labels, classifier='LDA')
     # kfold_classifier(features, labels, classifier='QDA')
     # kfold_classifier(features, labels, classifier='KNN')
-    kfold_classifier(features, labels, classifier='SVM', svm_kernal='rbf')
-    kfold_classifier(features, labels, classifier='SVM', svm_kernal='linear')
+    # kfold_classifier(features, labels, classifier='SVM', svm_kernal='rbf')
+    # kfold_classifier(features, labels, classifier='SVM', svm_kernal='linear')
     # kfold_classifier(features, labels, classifier='SVM', svm_kernal='sigmoid')
     # kfold_classifier(features, labels, classifier='SVM', svm_kernal='poly')
 
