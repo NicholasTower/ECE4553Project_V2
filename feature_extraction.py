@@ -1,3 +1,5 @@
+# This file is where the features from of the word recordings are extracted using libemg and the reduction is applied
+# using various methods.
 import warnings
 from matplotlib import pyplot as plt, cm
 from matplotlib.colors import Normalize
@@ -24,14 +26,13 @@ def feature_list_loop(feature_list, data, labels):
     # features = np.array([fe.extract_feature_group('HTD', [d], array=True) for d in train_data])
     return features
 
-def feature_visualization(old_features, old_labels):
+def apply_pca(old_features, old_labels, variance_kept=0.90, show_plots=False):
     # Here we can visualize the feature set and decide what is best.
     ss = StandardScaler()
     scaled_features = ss.fit_transform(old_features)
 
     # Principle Components:
-    percent_retained = 90
-    pca = PCA(random_state=0)
+    pca = PCA(n_components=variance_kept, random_state=0)
     transformed_features = pca.fit_transform(scaled_features)
     eigenvectors = pca.explained_variance_ratio_
     cumsum = 0
@@ -39,21 +40,15 @@ def feature_visualization(old_features, old_labels):
     # print(len(eigenvectors))
     for i in eigenvectors:
         cumsum += i*100
-        needed.append(i)
-        if cumsum >= percent_retained:
-            break
-    print(transformed_features.shape)
-    transformed_features = transformed_features.tolist()
-    for i, word in enumerate(transformed_features):
-        transformed_features[i] = word[:len(needed)]
-    transformed_features = np.array(transformed_features)
+        needed.append(cumsum/100)
 
     plt.figure()
     plt.plot(range(1, len(eigenvectors) + 1), eigenvectors, color="red", marker="o")
+    plt.plot(range(1, len(eigenvectors) + 1), needed, color="blue", marker="o")
     plt.bar(range(1, len(eigenvectors) + 1), eigenvectors)
     plt.xlabel("Eigenvector")
     plt.ylabel("Eigenvalue")
-    plt.title(f"Scree Plot of Dataset Words with {PCA}")
+    plt.title(f"Scree Plot of Dataset Words with PCA")
     plt.grid(True)
     # plt.show()
 
@@ -83,7 +78,8 @@ def feature_visualization(old_features, old_labels):
     plt.grid(True)
     plt.axhline(0, color='grey', linewidth=0.5)
     plt.axvline(0, color='grey', linewidth=0.5)
-    # plt.show()
+    if show_plots:
+        plt.show()
 
     # ICA
     # ica = FastICA(n_components=1, random_state=0)
@@ -93,7 +89,7 @@ def feature_visualization(old_features, old_labels):
     return transformed_features, old_labels     # PCA
     # return vectors, old_labels                  # ICA
 
-def get_extracted_features(data, labels):
+def get_extracted_features(data, labels, variance_kept=0.9, show_plots=False):
     # # After loading all of your words for a subject you should have an array of shape (num_words, channels, time)
     # data = np.zeros(100, 6, 15000)  # This would mean 100 words, 6 channels, 1500 timepoints
 
@@ -126,13 +122,17 @@ def get_extracted_features(data, labels):
     # print(features)
     # print(features.shape)
 
-    feature, labels = feature_visualization(features, labels)
+    features, labels = apply_pca(features, labels, variance_kept=variance_kept, show_plots=show_plots)
 
     return features, labels
 
-data = np.load(data_file, allow_pickle=True)
-labels = np.load(labels_file, allow_pickle=True)
-get_extracted_features(data, labels)
-# for feature_list in feature_group_list:
-#     print(f'Testing feature set: {feature_list}')
-#     feature_list_loop(feature_list, data, labels)
+def main():
+    data = np.load(data_file, allow_pickle=True)
+    labels = np.load(labels_file, allow_pickle=True)
+    get_extracted_features(data, labels, variance_kept=0.90, show_plots=True)
+    # for feature_list in feature_group_list:
+    #     print(f'Testing feature set: {feature_list}')
+    #     feature_list_loop(feature_list, data, labels)
+
+if __name__ == "__main__":
+    main()

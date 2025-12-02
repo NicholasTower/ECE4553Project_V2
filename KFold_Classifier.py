@@ -1,3 +1,5 @@
+# This file will run a kfold on different classifiers. It uses det_extracted_features() from feature_extraction.py to
+# get the features and labels it uses. The labels are passed through in case the feature extraction stuff changes things.
 import numpy as np
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from sklearn.model_selection import KFold
@@ -13,15 +15,12 @@ from feature_extraction import get_extracted_features
 data_file = r"data/train_data.pkl"
 labels_file = r"data/train_labels.pkl"
 
-data = np.load(data_file, allow_pickle=True)
-labels = np.load(labels_file, allow_pickle=True)
-
-def kfold_classifier(data, labels, classifier='LDA'):
-    features, labels = get_extracted_features(data, labels)
-    print(features.shape)
+def kfold_classifier(features, labels, classifier='LDA'):
+    # features, labels = get_extracted_features(data, labels)
+    # print(features.shape)
 
     percentages = []
-    kf = KFold(n_splits=10, shuffle=True, random_state=0)
+    kf = KFold(n_splits=8, shuffle=True, random_state=0)
     kf.get_n_splits(features)
 
     print(f'Beginning KFold with {classifier} splits')
@@ -72,8 +71,18 @@ def kfold_classifier(data, labels, classifier='LDA'):
     all_percentages["Average"] = average_percentage
     return all_percentages
 
+def main():
+    print("Loading data & labels...")
+    data = np.load(data_file, allow_pickle=True)
+    labels = np.load(labels_file, allow_pickle=True)
 
-kfold_classifier(data, labels, classifier='LDA')
-kfold_classifier(data, labels, classifier='QDA')
-kfold_classifier(data, labels, classifier='KNN')
-kfold_classifier(data, labels, classifier='SVM')
+    print("Getting features...")
+    features, labels = get_extracted_features(data, labels, variance_kept=0.9)
+
+    kfold_classifier(features, labels, classifier='LDA')
+    kfold_classifier(features, labels, classifier='QDA')
+    kfold_classifier(features, labels, classifier='KNN')
+    kfold_classifier(features, labels, classifier='SVM')
+
+if __name__ == "__main__":
+    main()

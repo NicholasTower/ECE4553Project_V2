@@ -1,3 +1,12 @@
+# This file can be run to take the .npy single word files made by extract_words.py and create pickle filed of the data
+# and labels for testing & training, filtered & unfiltered, and channel 5 (1-6) dropped & not dropped.
+#
+#
+#
+#
+#
+#
+
 import os
 
 import warnings         #Gets rid of pygame warning
