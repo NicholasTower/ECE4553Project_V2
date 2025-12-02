@@ -17,7 +17,7 @@ from feature_extraction import get_extracted_features
 data_file = r"data\train_data_ndrop_fewer_the.pkl"
 labels_file = r"data\train_labels_fewer_the.pkl"
 
-def kfold_classifier(features, labels, classifier='LDA'):
+def kfold_classifier(features, labels, classifier='LDA', svm_kernal='rbf'):
 
     class_names = np.unique(labels)
     all_true_labels = []
