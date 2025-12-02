@@ -5,7 +5,7 @@ def show_filters():
     filter = libemg.filtering.Filter(600)
 
     # extract sample word
-    data = np.load(r"dataset_words\AFTERWARDS_002_101_0366_3.npy")
+    data = np.load(r"dataset_words/AND_008_003_0242_5.npy")
 
     # data = np.delete(data, 4, axis=1)  # remove channel 5
 
