@@ -7,6 +7,7 @@ from sklearn.decomposition import PCA
 from sklearn.decomposition import KernelPCA
 from sklearn.decomposition import FastICA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.preprocessing import LabelEncoder
 
 warnings.filterwarnings(
         "ignore",
@@ -27,30 +28,35 @@ def feature_list_loop(feature_list, data, labels):
     # features = np.array([fe.extract_feature_group('HTD', [d], array=True) for d in train_data])
     return features
 
-def plotLDA(labels, features, dataset, plot=True):
+def plotLDA(labels, features, dataset, plot=False):
 
     lda = LinearDiscriminantAnalysis()
     scores = lda.fit_transform(features, labels)
+    print(scores)
 
-    # if (plot):
-    #     cmap = plt.get_cmap('tab10')
-    #     colors = {lab: cmap(i%10) for i, lab in enumerate(np.unique(labels))}
+    if (plot):
 
-    #     plt.xlabel("LD1")
-    #     plt.title("LDA Projection for "+dataset)
-    #     plt.grid(True)
+        le = LabelEncoder()
+        encoded_labels = le.fit_transform(labels)
+        class_names = le.classes_
 
-    #     for lab in np.unique(labels):
-    #         mask = (labels == lab)
-    #         if (scores.shape[1] == 1):
-    #             plt.scatter(scores[mask, 0], np.random.normal(loc=0, scale = 0.05, size=sum(mask)), label=str(lab), color=colors[lab], s=50)
-    #             plt.yticks([])  # remove y-axis, it's meaningless
-    #         else:
-    #             plt.scatter(scores[mask, 0], scores[mask, 1], label=str(lab), color=colors[lab], s=50, alpha=0.3, edgecolors="black")
-    #             plt.ylabel("LD2")
+        plt.figure(figsize=(10, 8))
+        colors = plt.cm.get_cmap('viridis', 8)
 
-    #     plt.legend()
-    #     plt.show()
+        for i, target_name in enumerate(class_names):
+            # 'scores' is the projected data (Component 1 is scores[:, 0], Component 2 is scores[:, 1])
+            # 'labels' is used for indexing the points belonging to class 'i'
+            plt.scatter(scores[encoded_labels == i, 0], scores[encoded_labels == i, 1], 
+                        alpha=0.8, color=colors(i),
+                        label=target_name)
+
+        plt.legend(loc='best', shadow=False, scatterpoints=1, title='Classes')
+        plt.title('LDA Projection of EMG Data onto 2 Dimensions')
+        plt.xlabel('LDA Component 1')
+        plt.ylabel('LDA Component 2')
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show() # Use plt.savefig('filename.png') to save the image
 
     return scores
 
@@ -147,11 +153,9 @@ def get_extracted_features(data, labels, variance_kept=0.9, show_plots=False):
 
     # features = np.array([fe.extract_features(['MAV'], [d], array=True)[0] for d in data])
     features = np.array([fe.extract_features(possible_features, [d], array=True)[0] for d in data])
-    print(features)
-    print(features.shape)
 
     # features, labels = apply_pca(features, labels, variance_kept=variance_kept, show_plots=show_plots)
-    features = plotLDA(labels, features, "Training Dataset", plot=show_plots)
+    features = plotLDA(labels, features, "Training Dataset")
 
     return features, labels
 

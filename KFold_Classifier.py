@@ -5,6 +5,8 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticD
 from sklearn.model_selection import KFold
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 import warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
@@ -12,12 +14,14 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 from feature_extraction import get_extracted_features
 
-data_file = r"data/train_data.pkl"
+data_file = r"data/train_data_ndrop.pkl"
 labels_file = r"data/train_labels.pkl"
 
 def kfold_classifier(features, labels, classifier='LDA'):
-    # features, labels = get_extracted_features(data, labels)
-    # print(features.shape)
+
+    class_names = np.unique(labels)
+    all_true_labels = []
+    all_predictions = []
 
     percentages = []
     kf = KFold(n_splits=8, shuffle=True, random_state=0)
@@ -54,6 +58,10 @@ def kfold_classifier(features, labels, classifier='LDA'):
 
         # print(f"   Real: index={test_labels}")
         resultant_prediction = clf.predict(test_features)
+
+        all_true_labels.extend(test_labels)
+        all_predictions.extend(resultant_prediction)
+
         # print(f"Guesses: {resultant_prediction}")
         total_correct = 0
         for k in range(len(test_labels)):
@@ -61,15 +69,45 @@ def kfold_classifier(features, labels, classifier='LDA'):
                 total_correct += 1
         percentages.append((total_correct / len(test_labels)) * 100)
         print(f"   Fold: {i}  Correct: {total_correct} -> {round(percentages[len(percentages) - 1], 2)}%")
+
     average_percentage = np.mean(percentages)
     standard_deviation = np.std(percentages)
     print(f"Average: {round(average_percentage, 2)}%")
     print(f"     SD: {round(standard_deviation, 2)}%\n\n")
+
+    plot_confusion_matrix_no_encoding(all_true_labels, all_predictions, class_names, classifier)
+
     all_percentages = dict()
     all_percentages["Standard Deviation"] = standard_deviation
     all_percentages["All"] = percentages
     all_percentages["Average"] = average_percentage
     return all_percentages
+
+def plot_confusion_matrix_no_encoding(true_labels, pred_labels, class_names, classifier_name):
+    """Calculates and plots the confusion matrix across all test folds using string labels."""
+    
+    # Calculate the Confusion Matrix
+    # We explicitly pass the class_names to ensure the matrix axes are correctly ordered.
+    cm = confusion_matrix(true_labels, pred_labels, labels=class_names) 
+    
+    # Display the Matrix
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
+    
+    fig, ax = plt.subplots(figsize=(8, 8))
+    disp.plot(cmap=plt.cm.Blues, ax=ax, xticks_rotation='vertical', values_format='d')
+    
+    ax.set_title(f'Confusion Matrix for {classifier_name} (Aggregated K-Fold)')
+    plt.tight_layout()
+    plt.show()
+
+    # Optional: Print Class-Wise Recall
+    print("\n--- Class-Wise Recall (Accuracy per Class) ---")
+    for i, name in enumerate(class_names):
+        true_positives = cm[i, i]
+        total_actual = np.sum(cm[i, :])
+        recall = (true_positives / total_actual) if total_actual > 0 else 0
+        print(f"  {name}: {true_positives} / {total_actual} Correct ({recall:.2f})")
+    print("------------------------------------------\n")
 
 def main():
     print("Loading data & labels...")
@@ -80,10 +118,10 @@ def main():
     # for i in range(1, 20):
     # features, labels = get_extracted_features(data, labels, variance_kept=0.9, methods_to_use=['pca', 'sfs'], n=i)
 
-    features, labels = get_extracted_features(data, labels, variance_kept=0.9, methods_to_use=['pca'])
-    kfold_classifier(features, labels, classifier='LDA')
-    kfold_classifier(features, labels, classifier='QDA')
-    kfold_classifier(features, labels, classifier='KNN')
+    features, labels = get_extracted_features(data, labels, variance_kept=0.9)
+    # kfold_classifier(features, labels, classifier='LDA')
+    # kfold_classifier(features, labels, classifier='QDA')
+    # kfold_classifier(features, labels, classifier='KNN')
     kfold_classifier(features, labels, classifier='SVM')
 
 if __name__ == "__main__":
