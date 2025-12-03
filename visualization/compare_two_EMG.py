@@ -8,10 +8,10 @@ import glob
 DATA_DIR = "./dataset_words" 
 
 # The words you want to compare
-TARGET_WORDS = ["PEOPLE", "NUMBER"] 
+TARGET_WORDS = ["IS", "IN"] 
 
 # Number of instances to plot for each word
-NUM_INSTANCES = 2
+NUM_INSTANCES = 1
 
 FS = 600 # Sampling Rate (Hz)
 
@@ -48,21 +48,22 @@ def find_and_load_data(target_words, num_instances, data_folder):
 
 def generate_comparison_plot(plot_data):
     """Generates the 2x2 grid plot for comparison."""
-    if len(plot_data) != 4:
-        print("Error: Could not collect exactly 4 samples for comparison.")
+    if len(plot_data) != 2:
+        print("Error: Could not collect exactly 2 samples for comparison.")
         return
 
-    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(14, 10))
+    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(10, 8))
     # Flatten the 2x2 array of axes into a 1D list for easier iteration
     axes = axes.flatten() 
     
-    fig.suptitle(f"EMG Comparison: 2 Instances of 'THE' vs. 2 Instances of 'BY'", fontsize=16, y=1.02)
+    fig.suptitle(f"Comparison of: '{TARGET_WORDS[0]}' vs. '{TARGET_WORDS[1]}'", fontsize=16)
     
     for i, item in enumerate(plot_data):
         ax = axes[i]
-        
+        axes[i].set_ylim(-35000, 35000)
+        axes[i].set_xlim(0, 0.14)
         # Determine unique label for the subplot title
-        title = f"{item['word']} - Instance {item['instance_num']}"
+        title = f"{item['word']}"
         title += f"\nDuration: {item['time'][-1]:.2f}s | Shape: {item['data'].shape}"
         ax.set_title(title)
         

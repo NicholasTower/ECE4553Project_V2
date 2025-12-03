@@ -53,6 +53,8 @@ def compare_two_instances(target_word, data_folder):
     for channel in range(data1.shape[1]):
         axes[0].plot(time_axis1, data1[:, channel] + (channel * 500), label=f"Ch {channel+1}") 
     axes[0].set_ylabel("EMG Amplitude (Offset)")
+    axes[0].set_ylim(-35000, 30000)
+    axes[0].set_xlim(0, 0.14)
     axes[0].legend(loc='upper right')
     axes[0].grid(True)
     
@@ -62,6 +64,8 @@ def compare_two_instances(target_word, data_folder):
         axes[1].plot(time_axis2, data2[:, channel] + (channel * 500), label=f"Ch {channel+1}") 
     axes[1].set_xlabel("Time (Seconds)")
     axes[1].set_ylabel("EMG Amplitude (Offset)")
+    axes[1].set_ylim(-35000, 30000)
+    axes[1].set_xlim(0, 0.14)
     axes[1].legend(loc='upper right')
     axes[1].grid(True)
 
