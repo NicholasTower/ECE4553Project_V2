@@ -4,7 +4,31 @@ import libemg
 import numpy as np
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
 
+def plot_confusion_matrix(true_labels, pred_labels, class_names, classifier_name):
+    
+    cm = confusion_matrix(true_labels, pred_labels, labels=class_names) 
+    
+    # Display the Matrix
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
+    
+    fig, ax = plt.subplots(figsize=(8, 8))
+    disp.plot(cmap=plt.cm.Blues, ax=ax, xticks_rotation='vertical', values_format='d')
+    
+    ax.set_title(f'Confusion Matrix using {classifier_name} for Test Set')
+    plt.tight_layout()
+    plt.show()
+
+    # Optional: Print Class-Wise Recall
+    print("\n--- Class-Wise Recall (Accuracy per Class) ---")
+    for i, name in enumerate(class_names):
+        true_positives = cm[i, i]
+        total_actual = np.sum(cm[i, :])
+        recall = (true_positives / total_actual) if total_actual > 0 else 0
+        print(f"  {name}: {true_positives} / {total_actual} Correct ({recall:.2f})")
+    print("------------------------------------------\n")
 
 def plotLDA(train_features, train_labels, test_features):
     print('Performing LDA...')
@@ -55,3 +79,5 @@ for k in range(len(test_labels)):
         total_correct += 1
 percentage = (total_correct / len(test_labels)) * 100
 print(f"Correct: {total_correct} of {len(test_labels)} -> {round(percentage, 2)}%")
+
+plot_confusion_matrix(test_labels, resultant_prediction, np.unique(test_labels), "LDA")

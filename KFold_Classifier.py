@@ -76,7 +76,7 @@ def kfold_classifier(features, labels, classifier='LDA', svm_kernal='rbf', plot_
     print(f"     SD: {round(standard_deviation, 2)}%\n\n")
 
     if plot_confusion_matrix:
-        plot_confusion_matrix_no_encoding(all_true_labels, all_predictions, class_names, classifier)
+        plot_confusion_matrix(all_true_labels, all_predictions, class_names, classifier)
 
     all_percentages = dict()
     all_percentages["Standard Deviation"] = standard_deviation
@@ -84,7 +84,7 @@ def kfold_classifier(features, labels, classifier='LDA', svm_kernal='rbf', plot_
     all_percentages["Average"] = average_percentage
     return all_percentages
 
-def plot_confusion_matrix_no_encoding(true_labels, pred_labels, class_names, classifier_name):
+def plot_confusion_matrix(true_labels, pred_labels, class_names, classifier_name):
     """Calculates and plots the confusion matrix across all test folds using string labels."""
     
     # Calculate the Confusion Matrix
