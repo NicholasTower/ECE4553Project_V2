@@ -1,3 +1,12 @@
+# This file can be run to take the .npy single word files made by extract_words.py and create pickle filed of the data
+# and labels for testing & training, filtered & unfiltered, and channel 5 (1-6) dropped & not dropped.
+#
+#
+#
+#
+#
+#
+
 import os
 
 import warnings         #Gets rid of pygame warning
@@ -13,13 +22,13 @@ import pickle
 
 from load_word_files import load_word_files
 
-gen_pkl = False
 gen_pkl = True
+# gen_pkl = False
 
 # might need to remove channel 5
 
 def filter_data(data):
-    filter = libemg.filtering.Filter(600)
+    filter = libemg.filtering.Filter(sampling_frequency=600)
 
     if not isinstance(data, np.ndarray):
         data = np.array(data)  # Ensure it's a numpy array
@@ -99,9 +108,9 @@ def generate_pickles(filter=True, drop_signal=None):
 
 if gen_pkl:
     generate_pickles()
-    generate_pickles(drop_signal=4)
-    generate_pickles(filter=False)
-    generate_pickles(filter=False, drop_signal=4)
+    # generate_pickles(drop_signal=4)
+    # generate_pickles(filter=False)
+    # generate_pickles(filter=False, drop_signal=4)
 
 print('loading train set')
 data = pickle.load(open('./data\\train_data.pkl', 'rb'))

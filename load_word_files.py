@@ -51,4 +51,8 @@ def load_word_files(folder, target_words, features_to_use, drop_signal=None, tes
 
     return word_file_names
 
-word_file_names = load_word_files(folder, target_words, features_to_use, drop_signal=4)
+def main():
+    word_file_names = load_word_files(folder, target_words, features_to_use, drop_signal=4)
+
+if __name__ == '__main__':
+    main()
