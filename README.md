@@ -1,6 +1,9 @@
 # Add EMG-UKA-Trial-Corpus to the directory from: https://www.kaggle.com/datasets/xabierdezuazo/emguka-trial-corpus?resource=download
-# Run "extract_words" to create a folder with 15757 files. These are all the words extracted from the dataset into numpy files.
-# Gemini summary: The NumPy files (.npy) output from the script are individual, synchronized EMG recordings for each word.Each file contains a single, two-dimensional array with the shape $(\text{Variable Samples}, 6\text{ Channels})$:Content: Raw EMG voltage values (16-bit integers) corresponding to muscle activity.Rows: The time duration of the spoken word, sampled at $600\text{ Hz}$ (variable length).Columns: The 6 muscle electrode channels used for data collection.The data is pre-processed for alignment: it has been cut using the offset_*.txt files to remove silence and markers, and then segmented using the words_*.txt files to isolate only the exact duration of the word. Since the length is variable, you'll need a next step (padding/truncation) before using it in a Machine Learning model.
+# Run extract_words.py to create a folder with 15757 files. These are all the words extracted from the dataset into numpy files.
+# The first 500 instances of the "THE" should be removed manually.
+# Running libemg_data_formatting.py will create the approprita .pkl files to classify the training and test words.
+# Running kFold_classifier will do all the steps to classify the chosen .pkl files (chosen at the top)
+# Run "Final Test.py" will classify the test words after automatically training with the training words.
 
 # You can run "compare_EMG.py" to create a graph with a couple instances of data for a chosen word.
 # You can run "compare_two_EMG.py" to create a graph to compare two different words.

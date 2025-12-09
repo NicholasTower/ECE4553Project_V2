@@ -112,10 +112,10 @@ if gen_pkl:
     # generate_pickles(filter=False)
     # generate_pickles(filter=False, drop_signal=4)
 
-print('loading train set')
-data = pickle.load(open('./data\\train_data.pkl', 'rb'))
-print(len(data), len(data[0]), len(data[0][0]))
-labels = pickle.load(open('./data\\train_labels.pkl', 'rb'))
+# print('loading train set')
+# data = pickle.load(open('./data\\train_data.pkl', 'rb'))
+# print(len(data), len(data[0]), len(data[0][0]))
+# labels = pickle.load(open('./data\\train_labels.pkl', 'rb'))
 # print(labels)
 
 # # After loading all of your words for a subject you should have an array of shape (num_words, channels, time)
